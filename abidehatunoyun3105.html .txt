@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oyun Portalı</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        /* GİRİŞ EKRANI */
+        #loginScreen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-box h1 {
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .login-box p {
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        #keyInput {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        #loginBtn {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            background: #00d4aa;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        #loginBtn:hover {
+            background: #00b894;
+            transform: translateY(-2px);
+        }
+
+        #errorMsg {
+            color: #ff6b6b;
+            margin-top: 15px;
+            display: none;
+            font-weight: bold;
+        }
+
+        /* OYUN EKRANI */
+        #gameScreen {
+            display: none;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .category {
+            margin-bottom: 40px;
+        }
+
+        .category h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-left: 20px;
+            border-left: 5px solid #00d4aa;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            transition: transform 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .game-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .game-info h3 {
+            margin-bottom: 10px;
+            font-size: 1.4em;
+        }
+
+        .game-info p {
+            opacity: 0.9;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .play-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #00d4aa;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .play-btn:hover {
+            background: transparent;
+            border-color: #00d4aa;
+            transform: scale(1.05);
+        }
+
+        .new-tab-icon::after {
+            content: " ↗";
+            font-size: 0.8em;
+        }
+
+        /* POPÜLER ETİKETİ */
+        .popular-tag {
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        /* YENİ ETİKETİ */
+        .new-tag {
+            background: #ffd700;
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        /* MOBİL UYUMLU */
+        @media (max-width: 768px) {
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .logout-btn {
+                position: static;
+                margin-top: 15px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- GİRİŞ EKRANI -->
+    <div id="loginScreen">
+        <div class="login-box">
+            <h1>🎮 Oyun Portalı</h1>
+            <p>Devam etmek için key girin</p>
+            <input type="text" id="keyInput" placeholder="KEY GİRİN">
+            <button id="loginBtn" onclick="checkKey()">GİRİŞ YAP</button>
+            <div id="errorMsg">❌ Yanlış key! Tekrar deneyin.</div>
+        </div>
+    </div>
+
+    <!-- OYUN EKRANI -->
+    <div id="gameScreen">
+        <button class="logout-btn" onclick="logout()">Çıkış Yap</button>
+        
+        <header>
+            <h1>🎮 Oyun Merkezi</h1>
+            <p>Test Edilmiş Çalışan Oyunlar!</p>
+        </header>
+
+        <!-- POPÜLER RANDOM OYUNLAR (BAŞTA) -->
+        <div class="category">
+            <h2>🔥 Popüler Random Oyunlar</h2>
+            <div class="games-grid">
+                <div class="game-card">
+                    <span class="new-tag">YENİ EKLENDİ</span>
+                    <div class="game-icon">🎮</div>
+                    <div class="game-info">
+                        <h3>Pixel Path</h3>
+                        <p>Pixel stil yol çizme oyunu. Strateji ve mantık. 2 kişilik oynanabilir!</p>
+                        <a href="https://www.twoplayergames.org/game/pixel-path" target="_blank" class="play-btn new-tab-icon">Oyna</a>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <span class="popular-tag">EN POPÜLER</span>
+                    <div class="game-icon">⚽</div>
+                    <div class="game-info">
+                        <h3>Soccer Random</h3>
+                        <p>Fizik tabanlı komik futbol. 1 veya 2 kişilik. Kontrolsüz hareketler, gülme garantili!</p>
+                        <a href="https://www.twoplayergames.org/game/soccer-random" target="_blank" class="play-btn new-tab-icon">Oyna</a>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <span class="popular-tag">ÇOK OYNANAN</span>
+                    <div class="game-icon">🏀</div>
+                    <div class="game-info">
+                        <h3>Basket Random</h3>
+                        <p>Kontrolsüz komik basketbol. Zıplayan toplar, saçma hareketler. 2 kişilik mod!</p>
+                        <a href="https://www.twoplayergames.org/game/basket-random" target="_blank" class="play-btn new-tab-icon">Oyna</a>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <span class="popular-tag">GÜNCEL</span>
+                    <div class="game-icon">🏐</div>
+                    <div class="game-info">
+                        <h3>Volley Random</h3>
+                        <p>Voleybolun komik hali. Uçan oyuncular, kaotik maçlar. Gülmekten oynayamazsın!</p>
+                        <a href="https://www.twoplayergames.org/game/volley-random" target="_blank" class="play-btn new-tab-icon">Oyna</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DİĞER SPOR OYUNLARI -->
+        <div class="category">
+            <h2>⚽ Diğer Spor Oyunları</h2>
+            <div class="games-grid">
+                <div class="game-card">
+                    <div class="game-icon">🥅</div>
+                    <div class="game-info">
+                        <h3>Penalty Shooters 2</h3>
+                        <p>Penaltı atışları ve kalecilik. Turnuva modu var.</p>
+                        <a href="https://www.crazygames.com/game/penalty-shooters-2" target="_blank" class="play-btn new-tab-icon">Oyna</a>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-icon">🏓</div>
+                    <div class="game-info">
+                        <h3>Table Tennis</h3>
+                        <p>Masa tenisi. Hızlı refleksler.</p>
+                        <a href="https://www.crazygames.com/game/table-tennis-world-tour" target="_blank" class="play-btn new-tab-icon">Oyna</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ARABA & YARIŞ -->
+        <div class="category">
+            <h2>🏎️ Araba & Yarış</h2>
+            <div class="games-grid">
+                <div class="game-card">
+                    <div class="game-icon">🏍️</div>
+                    <div class="game-info">
+                        <h3>Moto X3M</h3>
+                        <p>Ekstrem motosiklet parkurları.</p>
+                        <a href="https://www.crazygames.com/game/moto-x3m" target="_blank" class="play-btn new-tab-icon">Oyna</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KLASİK & ZEKA -->
+        <div class="category">
+            <h2>🧩 Klasik & Zeka</h2>
+            <div class="games-grid">
+                <div class="game-card">
+                    <div class="game-icon">🧱</div>
+                    <div class="game-info">
+                        <h3>Tetris</h3>
+                        <p>Efsanevi blok oyunu.</p>
+                        <a href="https://tetris.com/play-tetris" target="_blank" class="play-btn new-tab-icon">Oyna</a>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-icon">🔢</div>
+                    <div class="game-info">
+                        <h3>2048</h3>
+                        <p>Sayı birleştirme.</p>
+                        <a href="https://play2048.co/" target="_blank" class="play-btn new-tab-icon">Oyna</a>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-icon">♟️</div>
+                    <div class="game-info">
+                        <h3>Satranç</h3>
+                        <p>Bilgisayara karşı.</p>
+                        <a href="https://www.chess.com/play/computer" target="_blank" class="play-btn new-tab-icon">Oyna</a>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-icon">⭕</div>
+                    <div class="game-info">
+                        <h3>XOX</h3>
+                        <p>3 taş oyunu.</p>
+                        <a href="https://playtictactoe.org/" target="_blank" class="play-btn new-tab-icon">Oyna</a>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-icon">💣</div>
+                    <div class="game-info">
+                        <h3>Mayın Tarlası</h3>
+                        <p>Mantık oyunu.</p>
+                        <a href="https://minesweeper.online/" target="_blank" class="play-btn new-tab-icon">Oyna</a>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-icon">👻</div>
+                    <div class="game-info">
+                        <h3>Pac-Man</h3>
+                        <p>Labirent klasiği.</p>
+                        <a href="https://pacman.live/" target="_blank" class="play-btn new-tab-icon">Oyna</a>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-icon">🐍</div>
+                    <div class="game-info">
+                        <h3>Snake</h3>
+                        <p>Yılan oyunu.</p>
+                        <a href="https://playsnake.org/" target="_blank" class="play-btn new-tab-icon">Oyna</a>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-icon">🃏</div>
+                    <div class="game-info">
+                        <h3>Solitaire</h3>
+                        <p>İskambil oyunu.</p>
+                        <a href="https://www.solitr.com/" target="_blank" class="play-btn new-tab-icon">Oyna</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // KEY KONTROLÜ
+        function checkKey() {
+            const input = document.getElementById('keyInput').value.toLowerCase().trim();
+            const correctKey = 'abidehatun';
+            
+            if (input === correctKey) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('gameScreen').style.display = 'block';
+                localStorage.setItem('gameAuth', 'true');
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+                document.getElementById('keyInput').value = '';
+                setTimeout(() => {
+                    document.getElementById('errorMsg').style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // ÇIKIŞ
+        function logout() {
+            localStorage.removeItem('gameAuth');
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('keyInput').value = '';
+        }
+
+        // ENTER TUŞU
+        document.getElementById('keyInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkKey();
+            }
+        });
+
+        // SAYFA YÜKLENİNCE KONTROL
+        window.onload = function() {
+            if (localStorage.getItem('gameAuth') === 'true') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('gameScreen').style.display = 'block';
+            }
+        };
+    </script>
+
+</body>
+</html>
